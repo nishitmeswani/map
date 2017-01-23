@@ -1,23 +1,32 @@
-//global variable;
 var map;
+//Show Map On webpage
+var initMap = function () {
+    try {
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 3,
+            center: new google.maps.LatLng(48.3794, 31.1656)
+        });
+        applyMapStyles();
+        viewModel.init();
+    }
+    catch (error) {
+        alert("Check connection and come back later " + error);
+    }
+};
 
-var myerrorhandler = function(){
-	 alert("Unable to connect to Google Maps.");
-}
-
-//function removes unnecessary style/POI from the map
+//Defining Custom Styles
 var applyMapStyles = function () {
     var styleArray = [
         {
-            featureType: "all",
+            featureType: 'water',
             stylers: [
-                {visibility: "off"}
+              { color: '#19a0d8' }
             ]
-        },
+          },
         {
             featureType: "road",
             stylers: [
-                {visibility: "on"}
+                {visibility: "off"}
             ]
         },
         {
@@ -27,29 +36,107 @@ var applyMapStyles = function () {
             ]
         },
         {
-            featureType: "water",
+            featureType: 'road.highway',
+            elementType: 'geometry.stroke',
             stylers: [
-                {visibility: "on"}
+              { color: '#efe9e4' },
+              { lightness: -40 }
             ]
-        }
-    ];
+          },
+          {
+            featureType: 'water',
+            elementType: 'labels.text.stroke',
+            stylers: [
+              { lightness: 100 }
+            ]
+          },
+           ];
     map.setOptions({styles: styleArray});
 };
 
-//Google API script is calling this function to launch the app and render the map
-var initMap = function () {
-    try {
-        map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 2,
-            center: new google.maps.LatLng(24.8957746, 67.0770452),
-            mapTypeId: google.maps.MapTypeId.ROADMAP
+
+var largeInfowindow = new google.maps.InfoWindow();
+var bounds = new google.maps.LatLngBounds();
+//MODEL
+var model = {
+    self: this,
+  locations: [
+        {
+            title: ko.observable("Barcelona, Spain"),
+            lat: 41.3879,
+            lng: 2.1699,
+            isFiltered: ko.observable(true),
+        },
+        {
+            title: ko.observable("Madrid, Spain"),
+            lat: 40.4167,
+            lng: -3.7003,
+            isFiltered: ko.observable(true)
+        },
+        {
+            title: ko.observable("Manchester UK"),
+            lat: 53.4793,
+            lng: -2.2479,
+            isFiltered: ko.observable(true)
+        },
+        {
+            title: ko.observable("Munich, Germany"),
+            lat: 48.1448,
+            lng: 11.558,
+            isFiltered: ko.observable(true)
+        },
+        {
+            title: ko.observable("Paris, France"),
+            lat: 48.8566,
+            lng: 2.3522,
+            isFiltered: ko.observable(true)
+        }
+
+    ],
+
+
+    //creates a marker for each location.
+    addMarkers: function () {
+        for (var i = 0; i < this.locations.length; i++) {
+            this.locations[i].marker = this.createMarker(this.locations[i], i);
+        }
+    },
+
+    //marker creation function
+    createMarker: function (location) {
+        var marker = new google.maps.Marker({
+            title: location.title(),
+            map: map,
+            animation: google.maps.Animation.DROP,
+            position: new google.maps.LatLng(location.lat, location.lng)
         });
-        applyMapStyles();
-        viewModel.init();
+    marker.addListener('click', function() {
+            populateInfoWindow(this, largeInfowindow);
+          });
+        });
+        return marker;
+    },
+
+    //sets all data in Model - adds markers for all locations and sets content for each marker
+    init: function () {
+        this.addMarkers();
     }
-    catch (error) {
-        alert("Unable to connect to Google Maps. Error: " + error);
-    }
+
+    function populateInfoWindow(marker, infowindow) {
+        // Check to make sure the infowindow is not already opened on this marker.
+        if (infowindow.marker != marker) {
+          infowindow.marker = marker;
+          infowindow.setContent('<div>' + marker.title + '</div>');
+          infowindow.open(map, marker);
+          // Make sure the marker property is cleared if the infowindow is closed.
+          infowindow.addListener('closeclick',function(){
+            infowindow.setMarker(null);
+          });
+        }
+      }
+
+
+
 };
 
 // VIEW MODEL.
@@ -68,14 +155,6 @@ var viewModel = {
         viewModel.disableMarkers();
         location.marker.setAnimation(google.maps.Animation.BOUNCE);
         location.infowindow.open(map, location.marker);
-    },
-
-    //before activating a marker on the map, all the other markers should be deactivated
-    disableMarkers: function () {
-        for (var i = 0; i < this.locations().length; i++) {
-            this.locations()[i].marker.setAnimation(null);
-            this.locations()[i].infowindow.close();
-        }
     },
 
     //ViewModel grabs the info from Model about locations
@@ -113,122 +192,6 @@ var viewModel = {
         }
     }
 };
-
-//MODEL
-var model = {
-    self: this,
-    //the list of initial locations
-    locations: [
-        {
-            title: ko.observable("Lord's Cricket Ground"),
-            lat: 51.52,
-            lng: 0.172,
-            isFiltered: ko.observable(true)
-        },
-		{
-            title: ko.observable("Melbourne Cricket Ground"),
-            lat: -37.819696,
-            lng: 144.933739,
-            isFiltered: ko.observable(true)
-        },
-		{
-            title: ko.observable("Gaddafi Stadium"),
-            lat: 31.513066,
-            lng: 74.334858,
-            isFiltered: ko.observable(true)
-        },
-		{
-            title: ko.observable("Colombo Cricket Club Ground"),
-            lat: 6.9084381,
-            lng: 79.8655146,
-            isFiltered: ko.observable(true)
-        },
-		{
-            title: ko.observable("National Stadium, Karachi"),
-            lat: 24.8957746,
-            lng: 67.0770452,
-            isFiltered: ko.observable(true)
-        }
-        
-    ],
-
-    //adds content info from Wikipedia to be displayed on the infowindow when marker is activated
-    setContent: function () {
-        for (var i = 0; i < this.locations.length; i++) {
-            var wikiURL = "https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=" + this.locations[i].title();
-            var wikiRequestTimeout = setTimeout(function () {
-                article = "failed to get Wiki resources";
-				alert("failed to get Wiki resources");
-				
-            }, 8000);
-            var article = getWikiExtract(i, wikiRequestTimeout, wikiURL);
-
-            function getWikiExtract(i, wikiRequestTimeout, wikiURL) {
-                var result = '';
-                $.ajax({
-                    url: wikiURL,
-                    dataType: "jsonp"
-                }).done(function (data) {
-                    if (data && data.query && data.query.pages) {
-                        var pages = data.query.pages;
-                    }
-                    // if error: no pages returned
-                    else {
-                        result = "No pages were found in Wiki";
-                        model.locations[i].infowindow = new google.maps.InfoWindow({
-                            content: model.locations[i].title() + "<br><br>" + "Wikipedia info:" + "<br>" + result
-                        })
-                    }
-                    for (var id in pages) {
-                        result = pages[id].extract;
-                        model.locations[i].infowindow = new google.maps.InfoWindow({
-                            content: '<div class="infoWindow"' + '<strong><b>' + model.locations[i].title() + '</b></strong>' + '<br><br>' + "Wikipedia info:" + '<br>' + result + '</div>',
-                            maxWidth: '150'
-                        })
-                    }
-                    clearTimeout(wikiRequestTimeout);
-                }).fail(function () {
-                    alert("Unable to reach Wikipedia.");
-                    model.locations[i].infowindow = new google.maps.InfoWindow({
-                        content: model.locations[i].title() + "<br><br>" + "Wikipedia info:" + "<br>" + "Unavailable"
-                    })
-                })
-            }
-        }
-    },
-
-    //creates a marker for each location.
-    addMarkers: function () {
-        for (var i = 0; i < this.locations.length; i++) {
-            this.locations[i].marker = this.createMarker(this.locations[i], i);
-        }
-    },
-
-    //adds marker animation - bouncing feature, when the marker is clicked
-    toggleBounce: function (location) {
-        viewModel.disableMarkers();
-        location.marker.setAnimation(google.maps.Animation.BOUNCE);
-    },
-
-    //marker creation function
-    createMarker: function (location) {
-        var marker = new google.maps.Marker({
-            title: location.title(),
-            map: map,
-            draggable: false,
-            animation: google.maps.Animation.DROP,
-            position: new google.maps.LatLng(location.lat, location.lng)
-        });
-        marker.addListener('click', function () {
-            model.toggleBounce(location);
-            location.infowindow.open(map, marker);
-        });
-        return marker;
-    },
-
-    //sets all data in Model - adds markers for all locations and sets content for each marker
-    init: function () {
-        this.addMarkers();
-        this.setContent();
-    }
-};
+var myerrorhandler = function(){
+     alert("Unable to connect to Google Maps.");
+}

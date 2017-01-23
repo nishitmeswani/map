@@ -1,10 +1,17 @@
-#P5: Project: Neighborhood Map
-===============================
+Project: Neighborhood Map
 Developed by Nishit Meswani (Front-End Web Developer)
 
-##How to Start:
-==================
-- open the index.html
-- on left sidebar 5 cricket ground listed with filter search
-- on right sidebar google map
-- when click any item from list a popup will shown with detail on map.
+Technology Used
+
+Knockout JS (responsible for list population and "event" bindings)
+Google Map API
+Flickr API
+jQuery
+Bootstrap
+
+How to RUN
+- open the index.html file
+- It will load the map on the right(taking upto 1/10th of the page)
+-The Search bar gets displayed on the left(taking upto 1/10th of the page)
+-The Map Shows top 5 Football teams in Europe
+-Click on the markers for more information

@@ -1,0 +1,113 @@
+
+body {
+    font-family: "Lato", sans-serif;
+}
+
+.sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color:white;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+}
+
+.sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s
+}
+
+.sidenav a:hover, .offcanvas a:focus{
+    color: #f1f1f1;
+}
+
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
+}
+.title {
+    font-family: 'Oswald', sans-serif;
+    position:fixed;
+    height:110px;
+    right:0px;
+    bottom:0px;
+    margin-right: 10px;
+    text-shadow: 1px 1px 2px #999999;
+    word-wrap: break-word;
+}
+
+.title1 {
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.title2 {
+    font-size: 25px;
+    font-weight: 700;
+}
+@media (min-width: 700px) {
+  .title {
+      height:130px;
+      margin-right: 20px;
+  }
+
+.container-fluid {
+	height:100%;
+}
+
+.row {
+	height:100%;
+}
+
+#map{
+   height: 100%;
+}
+html{
+    font-size: 14px;
+    font-family: 'Ariel', sans-serif;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+body {
+
+    font-size: 14px;
+    font-family: 'Ariel', sans-serif;
+    line-height: 20px;
+    color: #000;
+    font-weight: 300;
+    height: 100%;
+    width: 100%;
+}
+li:hover {
+    background-color:white;
+    color: black;
+}
+
+input {
+    width: 100%;
+    line-height: 30px;
+    margin-bottom: 10px;
+    border-bottom: 2px solid antiquewhite;
+}
+
+.infoWindow {
+    width: 100%;
+    height: 200px;
+}

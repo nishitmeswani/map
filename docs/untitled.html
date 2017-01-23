@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+
+</body>
+</html>
+<head>
+  <title>Europe Team Mapping</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Oswald:700" rel="stylesheet">
+ </head>
+<body>
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-2">
+    <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; Menu</span>
+             <div id="mySidenav" class="sidenav">
+                <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+                <a>Top Euro Teams</a>
+                <input placeholder=" Search Top 5 Teams" type="search" data-bind="value: searchQuery, valueUpdate: 'input'" autocomplete="on">
+            <ul id="locationList" data-bind="foreach: locations">
+                <div data-bind="if: isFiltered">
+                    <li data-bind="text: title, click: $parent.toggleMarker"></li>
+                </div>
+            </ul>
+        </div>
+        </div>
+
+
+
+
+		<div id="map">
+		</div>
+	</div>
+</div>
+   <header class="title">
+      <p class="title1 text-right">Most Resourcefull</p>
+      <p class="title2 text-right">Football Clubs</p>
+    </header>
+
+<body>
+
+
+
+//Nedded For Menu
+<script>
+function openNav() {
+    document.getElementById("mySidenav").style.width = "250px";
+}
+
+function closeNav() {
+    document.getElementById("mySidenav").style.width = "0";
+}
+</script>
+//Normal Scripts
+<script type="text/javascript" src="js/knockout-3.4.0.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<script type="text/javascript" src="js/app.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAMXtte3AoQmA086WHfRmTy480WFRche4A&callback=initMap" onerror="myerrorhandler()" async defer></script>
+</body>
+</html>
