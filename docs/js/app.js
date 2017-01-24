@@ -118,41 +118,81 @@ var model = {
     self: this,
     locations: [
         {
-            title: ko.observable("Barcelona, Spain"),
+            title: ko.observable("Barcelona"),
             lat: 41.3879,
             lng: 2.1699,
             isFiltered: ko.observable(true),
             Url:"https://en.wikipedia.org/wiki/Manchester_United_F.C."
         },
         {
-            title: ko.observable("Madrid, Spain"),
+            title: ko.observable("Madrid"),
             lat: 40.4167,
             lng: -3.7003,
             isFiltered: ko.observable(true)
         },
         {
-            title: ko.observable("Manchester UK"),
+            title: ko.observable("Manchester"),
             lat: 53.4793,
             lng: -2.2479,
             isFiltered: ko.observable(true)
         },
         {
-            title: ko.observable("Munich, Germany"),
+            title: ko.observable("Munich"),
             lat: 48.1448,
             lng: 11.558,
             isFiltered: ko.observable(true)
         },
         {
-            title: ko.observable("Paris, France"),
+            title: ko.observable("Paris"),
             lat: 48.8566,
             lng: 2.3522,
             isFiltered: ko.observable(true)
         }
 
     ],
-  //function should enter wiki-informaation which i cant get a workaround
-     setContent : function () {
+   //adds content info from Wikipedia to be displayed on the infowindow when marker is activated
+    setContent: function () {
+        for (var i = 0; i < this.locations.length; i++) {
+            var wikiURL = "https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=" + this.locations[i].title();
+            var wikiRequestTimeout = setTimeout(function () {
+                article = "failed to get Wiki resources";
+                alert("failed to get Wiki resources");
 
+            }, 8000);
+            var article = getWikiExtract(i, wikiRequestTimeout, wikiURL);
+
+            function getWikiExtract(i, wikiRequestTimeout, wikiURL) {
+                var result = '';
+                $.ajax({
+                    url: wikiURL,
+                    dataType: "jsonp"
+                }).done(function (data) {
+                    if (data && data.query && data.query.pages) {
+                        var pages = data.query.pages;
+                    }
+                    // if error: no pages returned
+                    else {
+                        result = "No pages were found in Wiki";
+                        model.locations[i].infowindow = new google.maps.InfoWindow({
+                            content: model.locations[i].title() + "<br><br>" + "Wikipedia info:" + "<br>" + result
+                        })
+                    }
+                    for (var id in pages) {
+                        result = pages[id].extract;
+                        model.locations[i].infowindow = new google.maps.InfoWindow({
+                            content: '<div class="infoWindow"' + '<strong><b>' + model.locations[i].title() + '</b></strong>' + '<br><br>' + "Wikipedia info:" + '<br>' + result + '</div>',
+                            maxWidth: '150'
+                        })
+                    }
+                    clearTimeout(wikiRequestTimeout);
+                }).fail(function () {
+                    alert("Unable to reach Wikipedia.");
+                    model.locations[i].infowindow = new google.maps.InfoWindow({
+                        content: model.locations[i].title() + "<br><br>" + "Wikipedia info:" + "<br>" + "Unavailable"
+                    })
+                })
+            }
+        }
     },
 
     //creates a marker for each location.
