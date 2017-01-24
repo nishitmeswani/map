@@ -1,20 +1,7 @@
+//global variable;
 var map;
-//Show Map On webpage
-var initMap = function () {
-    try {
-        map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 3,
-            center: new google.maps.LatLng(48.3794, 31.1656)
-        });
-        applyMapStyles();
-        viewModel.init();
-    }
-    catch (error) {
-        alert("Check connection and come back later " + error);
-    }
-};
 
-//Defining Custom Styles
+//function removes unnecessary style/POI from the map
 var applyMapStyles = function () {
     var styleArray = [
         {
@@ -54,89 +41,14 @@ var applyMapStyles = function () {
     map.setOptions({styles: styleArray});
 };
 
-
-var largeInfowindow = new google.maps.InfoWindow();
-var bounds = new google.maps.LatLngBounds();
-//MODEL
-var model = {
-    self: this,
-  locations: [
-        {
-            title: ko.observable("Barcelona, Spain"),
-            lat: 41.3879,
-            lng: 2.1699,
-            isFiltered: ko.observable(true),
-        },
-        {
-            title: ko.observable("Madrid, Spain"),
-            lat: 40.4167,
-            lng: -3.7003,
-            isFiltered: ko.observable(true)
-        },
-        {
-            title: ko.observable("Manchester UK"),
-            lat: 53.4793,
-            lng: -2.2479,
-            isFiltered: ko.observable(true)
-        },
-        {
-            title: ko.observable("Munich, Germany"),
-            lat: 48.1448,
-            lng: 11.558,
-            isFiltered: ko.observable(true)
-        },
-        {
-            title: ko.observable("Paris, France"),
-            lat: 48.8566,
-            lng: 2.3522,
-            isFiltered: ko.observable(true)
-        }
-
-    ],
-
-
-    //creates a marker for each location.
-    addMarkers: function () {
-        for (var i = 0; i < this.locations.length; i++) {
-            this.locations[i].marker = this.createMarker(this.locations[i], i);
-        }
-    },
-
-    //marker creation function
-    createMarker: function (location) {
-        var marker = new google.maps.Marker({
-            title: location.title(),
-            map: map,
-            animation: google.maps.Animation.DROP,
-            position: new google.maps.LatLng(location.lat, location.lng)
+//Map Display
+var initMap = function () {
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 3,
+            center: new google.maps.LatLng(48.3794, 31.1656),
         });
-    marker.addListener('click', function() {
-            populateInfoWindow(this, largeInfowindow);
-          });
-        });
-        return marker;
-    },
-
-    //sets all data in Model - adds markers for all locations and sets content for each marker
-    init: function () {
-        this.addMarkers();
-    }
-
-    function populateInfoWindow(marker, infowindow) {
-        // Check to make sure the infowindow is not already opened on this marker.
-        if (infowindow.marker != marker) {
-          infowindow.marker = marker;
-          infowindow.setContent('<div>' + marker.title + '</div>');
-          infowindow.open(map, marker);
-          // Make sure the marker property is cleared if the infowindow is closed.
-          infowindow.addListener('closeclick',function(){
-            infowindow.setMarker(null);
-          });
-        }
-      }
-
-
-
+        applyMapStyles();
+        viewModel.init();
 };
 
 // VIEW MODEL.
@@ -155,6 +67,14 @@ var viewModel = {
         viewModel.disableMarkers();
         location.marker.setAnimation(google.maps.Animation.BOUNCE);
         location.infowindow.open(map, location.marker);
+    },
+
+    //before activating a marker on the map, all the other markers should be deactivated
+    disableMarkers: function () {
+        for (var i = 0; i < this.locations().length; i++) {
+            this.locations()[i].marker.setAnimation(null);
+            this.locations()[i].infowindow.close();
+        }
     },
 
     //ViewModel grabs the info from Model about locations
@@ -192,6 +112,76 @@ var viewModel = {
         }
     }
 };
-var myerrorhandler = function(){
-     alert("Unable to connect to Google Maps.");
-}
+
+//List of top Euro Teams
+var model = {
+    self: this,
+    locations: [
+        {
+            title: ko.observable("Barcelona, Spain"),
+            lat: 41.3879,
+            lng: 2.1699,
+            isFiltered: ko.observable(true),
+            Url:"https://en.wikipedia.org/wiki/Manchester_United_F.C."
+        },
+        {
+            title: ko.observable("Madrid, Spain"),
+            lat: 40.4167,
+            lng: -3.7003,
+            isFiltered: ko.observable(true)
+        },
+        {
+            title: ko.observable("Manchester UK"),
+            lat: 53.4793,
+            lng: -2.2479,
+            isFiltered: ko.observable(true)
+        },
+        {
+            title: ko.observable("Munich, Germany"),
+            lat: 48.1448,
+            lng: 11.558,
+            isFiltered: ko.observable(true)
+        },
+        {
+            title: ko.observable("Paris, France"),
+            lat: 48.8566,
+            lng: 2.3522,
+            isFiltered: ko.observable(true)
+        }
+
+    ],
+
+    //creates a marker for each location.
+    addMarkers: function () {
+        for (var i = 0; i < this.locations.length; i++) {
+            this.locations[i].marker = this.createMarker(this.locations[i], i);
+        }
+    },
+
+    //adds marker animation - bouncing feature, when the marker is clicked
+    toggleBounce: function (location) {
+        viewModel.disableMarkers();
+        location.marker.setAnimation(google.maps.Animation.BOUNCE);
+    },
+
+    //marker creation function
+    createMarker: function (location) {
+        var marker = new google.maps.Marker({
+            title: location.title(),
+            map: map,
+            animation: google.maps.Animation.DROP,
+            position: new google.maps.LatLng(location.lat, location.lng)
+        });
+        marker.addListener('click', function () {
+            model.toggleBounce(location);
+            location.infowindow.open(map, marker);
+        });
+        return marker;
+    },
+
+    //sets all data in Model - adds markers for all locations and sets content for each marker
+    init: function () {
+        this.addMarkers();
+        this.setContent();
+    }
+};
