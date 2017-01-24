@@ -1,5 +1,8 @@
 //global variable;
 var map;
+var myerrorhandler = function(){
+     alert("Unable to connect to Google Maps.");
+}
 
 //function removes unnecessary style/POI from the map
 var applyMapStyles = function () {
@@ -43,12 +46,18 @@ var applyMapStyles = function () {
 
 //Map Display
 var initMap = function () {
+    try {
         map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 3,
-            center: new google.maps.LatLng(48.3794, 31.1656),
+            zoom: 2,
+            center: new google.maps.LatLng(24.8957746, 67.0770452),
+            mapTypeId: google.maps.MapTypeId.ROADMAP
         });
         applyMapStyles();
         viewModel.init();
+    }
+    catch (error) {
+        alert("Unable to connect to Google Maps. Error: " + error);
+    }
 };
 
 // VIEW MODEL.
