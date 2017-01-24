@@ -150,6 +150,10 @@ var model = {
         }
 
     ],
+  //function should enter wiki-informaation which i cant get a workaround
+     setContent : function () {
+
+    },
 
     //creates a marker for each location.
     addMarkers: function () {
