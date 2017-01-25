@@ -61,11 +61,6 @@ body {
     font-size: 25px;
     font-weight: 700;
 }
-@media (min-width: 700px) {
-  .title {
-      height:130px;
-      margin-right: 20px;
-  }
 
 .container-fluid {
 	height:100%;
